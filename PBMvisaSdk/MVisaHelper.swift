@@ -27,7 +27,10 @@ open class MVisahelper: PBDelegate, QrDetector {
         
         let cameraVC = CameraViewController()
         cameraVC.detector = self
-        UIApplication.shared.keyWindow?.rootViewController?.present(cameraVC, animated: true, completion: nil)
+        if let top = UIApplication.shared.topMostViewController() {
+            top.present(cameraVC, animated: true, completion: nil)
+        }
+        
     }
     
     open func initPayment(orderId: String, cardId: String?, description: String, extraParams: [String:String]?){
@@ -118,4 +121,28 @@ open class MVisahelper: PBDelegate, QrDetector {
 
 public protocol QrDetector {
     func detected(mVisa: MVisa)
+}
+
+extension UIViewController {
+    func topMostViewController() -> UIViewController {
+        if self.presentedViewController == nil {
+            return self
+        }
+        if let navigation = self.presentedViewController as? UINavigationController {
+            return navigation.visibleViewController!.topMostViewController()
+        }
+        if let tab = self.presentedViewController as? UITabBarController {
+            if let selectedTab = tab.selectedViewController {
+                return selectedTab.topMostViewController()
+            }
+            return tab.topMostViewController()
+        }
+        return self.presentedViewController!.topMostViewController()
+    }
+}
+
+extension UIApplication {
+    func topMostViewController() -> UIViewController? {
+        return self.keyWindow?.rootViewController?.topMostViewController()
+    }
 }

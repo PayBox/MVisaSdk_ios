@@ -1,37 +1,29 @@
-**PayBox SDK (Swift)**
+**PBMvisaSdk SDK (Swift)**
 
-PayBox SDK - это библиотека позволяющая упростить взаимодействие с API PayBox. Система SDK работает на iOS 10.3 и выше
-
-**Описание возможностей:**
-
-- Инициализация платежа
-- Отмена платежа
-- Возврат платежа
-- Проведение рекуррентного платежа с сохраненными картами
-- Получение информации/статуса платежа
-- Добавление карт
-- Оплата добавленными картами
-- Удаление карт
+PBMvisaSdk SDK - это библиотека позволяющая проводить оплату Mvisa через API PayBox. 
+Библиотека работает совместно с [SDK_iOS-input-](https://github.com/PayBox/SDK_iOS-input-)
 
 **Установка:**
 
-1. Установите &quot;Cocoapods&quot; - менеджер зависимостей проектов Cocoa, с помощью команды:
+1. Установите "Cocoapods" - менеджер зависимостей проектов Cocoa, с помощью команды:
 ```
         $ gem install cocoapods
 ```
-1. Чтобы интегрировать &quot;PayBoxSdk&quot; в проект Xcode с использованием &quot;Cocoapods&quot;, создайте в корне проекта файл &quot;Podfile&quot; и вставьте в файл следующую команду:
+1. Чтобы интегрировать "PBMvisaSdk" в проект Xcode с использованием "Cocoapods", создайте в корне проекта файл "Podfile" и вставьте в файл следующую команду:
 ```
         source 'https://github.com/CocoaPods/Specs.git' 
-        platform :ios, '10.0';
+        platform :ios, '12.1';
         use_frameworks!
         target 'Project name' do
         pod 'PayBoxSdk', :git => 'https://github.com/PayBox/SDK_iOS-input-.git', :submodules => true
+        pod 'PBMvisaSdk', :git => 'https://github.com/PayBox/MVisaSdk_ios.git', :submodules => true
         end
 ```
 1. Затем выполните след. команду:
 ```       
         $ pod install
 ```
+
 **Инициализация SDK:**
 ```
         import PayBoxSdk
@@ -60,7 +52,7 @@ PayBox SDK - это библиотека позволяющая упростит
 ```
 Для передачи информации от платежного гейта:
 ```
-        builder.feedBackUrl(checkUrl: String, resultUrl: String, refundUrl: String, captureUrl: String, method: REQUEST\_METHOD)
+        builder.feedBackUrl(checkUrl: String, resultUrl: String, refundUrl: String, captureUrl: String, method: REQUEST_METHOD)
 ```
 Время (в секундах) в течение которого платеж должен быть завершен, в противном случае, при проведении платежа, PayBox откажет платежной системе в проведении (мин. 300 (5 минут), макс. 604800 (7 суток), по умолчанию 300):
 ```
@@ -74,115 +66,43 @@ PayBox SDK - это библиотека позволяющая упростит
 
 **Работа с SDK:**
 
-Для связи с SDK,  имплементируйте в UIViewController -> PBDelegate:
+Для связи с SDK,  имплементируйте в UIViewController -> PBMVisaDelegate:
 В методе viewDidLoad() добавьте:
 ```
-        PBHelper.sdk.pbDelegate(delegate: self)
+        MVisahelper.instance.delegate = self
 ```
-**Для инициализации платежа** (при инициализации с параметром &quot;builder.enableRecurring(int)&quot;, карты сохраняются в системе PayBox):
+**Для вызова сканера**
+```
+        MVisahelper.instance.initScanner(userId: text)
+```
+В ответ откроется "QR сканер", наведите камеру смартфона на QR MVisa, после сканирования "QR сканер" закроется и в вашем viewController вызовется функция:
+```
+        func onQrDetected(mVisa: MVisa?, cards: [Card]?)
+```
+Во входных параметрах будет:
+    1. mVisa - содержит сумму платежа, валюта платежа, имя мерчанта и номер мерчанта в системе MVisa;
+    2. cards - содержит массив доступных карт пользователя, если пользователь не добавлял карты то вместо массива будет "null";
 
-        PBHelper.sdk.initPayment(orderId: String, userId: Int, amount: Float, description: String, extraParams: [String: String]?)
+Данные параметры вы сможете отобразить на вашей странице "Подтверждения платежа"
 
-В ответ откроется &quot;webView&quot; для заполнения карточных данных, после успешной оплаты вызовется функция:
-```
-        override func onPaymentPaid(response: Response)
-```
 
-**Для отмены платежа, по которому не прошел клиринг:**
-```
-        PBHelper.sdk.initCancelPayment(paymentId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onPaymentCanceled(response: Response)
-```
-Активация режима рекуррентного платежа: во входном параметре указывается время, на протяжении которого продавец рассчитывает использовать профиль рекуррентных платежей. Минимальное допустимое значение 1 (1 месяц). Максимальное допустимое значение: 156 (13 лет):
-```
-        PBHelper.sdk.enableRecurring(lifetime: 3)
-```
-Отключение режима рекуррентного платежа:
-```
-        PBHelper.sdk.disableRecurring()
-```
+**Подтверждение платежа**
 
-**Для проведения возврата платежа, по которому прошел клиринг:**
+После подтверждения платежа пользователем вызовите метод:
+```        
+        MVisahelper.instance.initPayment(orderId: String, cardId: String?, description: String, extraParams: [String:String]?) //Если пользователь не добавлял карт то вместо "cardId" укажите nil
 ```
-        PBHelper.sdk.initRevokePayment(paymentId: Int, amount: Float)
-```
-После успешной операции вызовется метод:
+1. Если пользователь не добавлял карт то в ответ откроется "WebView" с платежной страницей, после оплаты карта будет сохранена в системе PayBox.
+2. Если пользователь добавил карту ранее то пройдет платеж по "Рекуррентному профилю".
 
-        override func onPaymentRevoked(response: Response)
-
-**Для проведения рекуррентного платежа добавленной картой:**
+После оплаты в вашем "viewController" вызовется функция:
 ```
-        PBHelper.sdk.makeRecurring(amount: Float, recurringProfile: String, description: String, extraParams: [String: String]?)
-```
-После успешной операции вызовется метод:
-```
-        override func onRecurringPaid(recurringResponse: Recurring)
+        func onQrPayment(response: Response)
 ```
 
-**Для получения статуса платежа:**
+В случае ошибки или неуспешного платежа вызовется метод:
 ```
-        PBHelper.sdk.getPaymentStatus(paymentId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onPaymentStatus(status: PStatus)
-```
-
-**Для проведения клиринга:**
-```
-        PBHelper.sdk.initPaymentDoCapture(paymentId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onPaymentCaptured(capture: Capture)
-```
-
-**Для добавления карты:**
-```
-        PBHelper.sdk.addCard(userId: Int, postUrl: String) //postUrl - для обратной связи
-```
-В ответ откроется &quot;webView&quot; для заполнения карточных данных, после успешной операции вызовется метод:
-```
-        override func onCardAdded(response: Response)
-```
-
-**Для удаления карт:**
-```
-        PBHelper.sdk.removeCard(userId: Int, cardId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onCardRemoved(card: Card)
-```
-
-**Для отображения списка карт:**
-```
-        PBHelper.sdk.getCards(userId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onCardListed(cards: [Int : Card])
-```
-
-**Для создания платежа добавленной картой:**
-```
-        PBHelper.sdk.initCardPayment(amount: Float, userId: Int, cardId: Int, orderId: String, description: String, extraParams: [String: String]?)
-```
-После успешной операции вызовется метод:
-```
-        override func onCardPayInited(response: Response)
-```
-
-**Для проведения платежа добавленной картой:**
-```
-        PBHelper.sdk.cardPay(paymentId: Int)
-```
-В ответ откроется &quot;webView&quot;, после успешной операции вызовется метод:
-```
-        override func onCardPaid(response: Response)
+        func onQrError(error: ErrorResponse)
 ```
 
 **Описание некоторых входных параметров**

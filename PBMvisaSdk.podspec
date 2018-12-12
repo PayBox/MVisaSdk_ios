@@ -11,10 +11,12 @@ Pod::Spec.new do |s|
   s.license      = { :type => "MIT", :file => "LICENSE" }
   s.pod_target_xcconfig = {'SWIFT_VERSION' => '4.0','LIBRARY_SEARCH_PATHS' => '$(SRCROOT)/PBMvisaSdk/'}
   s.author             = { "Arman" => "am@paybox.money" }
+  s.dependency 'PayBoxSdk'
   s.public_header_files = 'PBMvisaSdk/*.h'
   s.ios.deployment_target = '12.1'
   s.requires_arc = true
-  s.source       = { :git => "https://github.com/PayBox/PBMvisaSdk.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/PayBox/PBMvisaSdk.git", :tag => "#{s.version}",
+                        :git => "https://github.com/PayBox/SDK_iOS-input-.git", :tag => "1.0.5" }
   s.source_files  = 'PBMvisaSdk/*.{swift,h}', 'PBMvisaSdk/commonCrypto/*.{c,h}'
   s.libraries = 'z'
   

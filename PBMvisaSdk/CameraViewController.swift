@@ -5,7 +5,6 @@ import UIKit
 class CameraViewController : QRCodeScannerViewController {
     
 
-    
     open var detector: QrDetector?
     override func processQRCodeContent(qrCodeContent: String) -> Bool {
         
