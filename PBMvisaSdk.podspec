@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.author             = { "Arman" => "am@paybox.money" }
   s.dependency 'PayBoxSdk'
   s.public_header_files = 'PBMvisaSdk/*.h'
-  s.ios.deployment_target = '12.1'
+  s.ios.deployment_target = '9.0'
   s.requires_arc = true
   s.source       = { :git => "https://github.com/PayBox/PBMvisaSdk.git", :tag => "#{s.version}",
                         :git => "https://github.com/PayBox/SDK_iOS-input-.git", :tag => "1.0.5" }
