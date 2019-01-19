@@ -41,5 +41,28 @@ class CameraViewController : QRCodeScannerViewController {
         alert.addAction(okAction)
         present(alert, animated: true, completion: nil)
     }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        initToolbar()
+    }
+
+    override var prefersStatusBarHidden: Bool{
+        return true
+    }
+
+    private func initToolbar(){
+        let toolbar = UIToolbar()
+        toolbar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 50)
+        toolbar.sizeToFit()
+        toolbar.backgroundColor = UIColor.blue
+        let cancel = UIBarButtonItem.init(title: "Назад", style: UIBarButtonItemStyle.plain, target: self, action: #selector(exit))
+        toolbar.setItems([cancel], animated: true)
+        self.view.addSubview(toolbar)
+    }
+    
+    @objc private func exit(){
+        self.dismiss(animated: true, completion: nil)
+    }
     
 }
