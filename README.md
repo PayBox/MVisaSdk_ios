@@ -9,7 +9,7 @@ PBMvisaSdk SDK - это библиотека позволяющая провод
 ```
         $ gem install cocoapods
 ```
-1. Чтобы интегрировать "PBMvisaSdk" в проект Xcode с использованием "Cocoapods", создайте в корне проекта файл "Podfile" и вставьте в файл следующую команду:
+2. Чтобы интегрировать "PBMvisaSdk" в проект Xcode с использованием "Cocoapods", создайте в корне проекта файл "Podfile" и вставьте в файл следующую команду:
 ```
         source 'https://github.com/CocoaPods/Specs.git' 
         platform :ios, '12.1';
@@ -19,7 +19,7 @@ PBMvisaSdk SDK - это библиотека позволяющая провод
         pod 'PBMvisaSdk', :git => 'https://github.com/PayBox/MVisaSdk_ios.git', :submodules => true
         end
 ```
-1. Затем выполните след. команду:
+3. Затем выполните след. команду:
 ```       
         $ pod install
 ```
