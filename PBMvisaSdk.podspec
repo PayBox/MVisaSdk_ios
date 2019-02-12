@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
  
 
   s.name         = "PBMvisaSdk"
-  s.version      = "0.9.2"
+  s.version      = "0.9.3"
   s.summary      = "PBMvisaSdk"
   s.description  = "mvisaSdk"
   s.homepage     = "http://paybox.money"
@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '9.0'
   s.requires_arc = true
   s.source       = { :git => "https://github.com/PayBox/PBMvisaSdk.git", :tag => "#{s.version}",
-                        :git => "https://github.com/PayBox/SDK_iOS-input-.git", :tag => "1.0.5" }
+                        :git => "https://github.com/PayBox/SDK_iOS-input-.git", :tag => "1.0.7" }
   s.source_files  = 'PBMvisaSdk/*.{swift,h}', 'PBMvisaSdk/commonCrypto/*.{c,h}'
   s.libraries = 'z'
   
